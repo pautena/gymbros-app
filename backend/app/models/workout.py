@@ -23,6 +23,7 @@ class Workout(WorkoutBase, table=True):
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
     owner: User | None = Relationship(back_populates="workouts")
+    schedules: list["WorkoutSchedule"] = Relationship(back_populates="workout")
 
 class WorkoutPublic(WorkoutBase):
     id: uuid.UUID
@@ -33,3 +34,11 @@ class WorkoutPublic(WorkoutBase):
 class WorkoutsPublic(SQLModel):
     data: list[WorkoutPublic]
     count: int
+
+class WorkoutSchedule(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    workout_id: uuid.UUID = Field(foreign_key="workout.id", nullable=False)
+    workout: Workout = Relationship(back_populates="schedules")
+    date: datetime
+    user_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
+    user: User = Relationship(back_populates="schedules")
